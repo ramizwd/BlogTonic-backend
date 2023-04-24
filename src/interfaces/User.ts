@@ -12,4 +12,13 @@ interface UserIdWithToken {
   isAdmin: boolean;
 }
 
-export {User, UserIdWithToken};
+interface UserTest {
+  id?: string;
+  username?: string;
+  userName?: string;
+  email?: string;
+  password?: string;
+  token?: string;
+}
+
+export {User, UserIdWithToken, UserTest};

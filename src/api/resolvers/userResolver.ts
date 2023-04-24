@@ -101,6 +101,7 @@ export default {
           extensions: {code: 'NOT_FOUND'},
         });
       }
+
       return (await response.json()) as LoginMessageResponse;
     },
 
@@ -129,8 +130,8 @@ export default {
           extensions: {code: 'NOT_FOUND'},
         });
       }
-      const deleteUser = (await response.json()) as LoginMessageResponse;
-      return deleteUser;
+
+      return (await response.json()) as LoginMessageResponse;
     },
   },
 };
