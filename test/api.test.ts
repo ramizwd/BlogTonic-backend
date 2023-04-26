@@ -1,10 +1,19 @@
+import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import app from '../src/app';
 import {getNotFound} from './testFunctions';
 import randomstring from 'randomstring';
 import {UserTest} from '../src/interfaces/User';
 import LoginMessageResponse from '../src/interfaces/LoginMessageResponse';
-import {createUser, getUserById, getUsers, login} from './userFunctions';
+import {
+  createUser,
+  deleteUser,
+  getUserById,
+  getUsers,
+  login,
+  loginBrute,
+  updateUser,
+} from './userFunctions';
 
 const DATABASE_URL = process.env.DATABASE_URL as string;
 
@@ -66,4 +75,45 @@ describe('GraphQL API tests', () => {
   it('should return single user', async () => {
     await getUserById(app, userData.user.id!);
   });
+
+  // make sure token has role (so that we can test if user is admin or not)
+  it('token should have role', async () => {
+    const dataFromToken = jwt.verify(
+      userData.token!,
+      process.env.JWT_SECRET as string
+    );
+    expect(dataFromToken).toHaveProperty('isAdmin');
+  });
+
+  // test update user
+  it('should update user', async () => {
+    await updateUser(app, userData.token!);
+  });
+
+  // test delete user based on token
+  it('should delete current user', async () => {
+    await deleteUser(app, userData.token!);
+  });
+
+  //   test brute force protection
+  //   test('Brute force attack simulation', async () => {
+  //     const maxAttempts = 20;
+  //     const mockUser: UserTest = {
+  //       username: 'TestUser' + randomstring.generate(7),
+  //       email: randomstring.generate(9).toLowerCase() + '@user.com',
+  //       password: 'wrongpassword123!',
+  //     };
+
+  //     try {
+  //       for (let i = 0; i < maxAttempts; i++) {
+  //         const result = await loginBrute(app, mockUser);
+  //         if (result) throw new Error('Brute force attack unsuccessful');
+  //       }
+
+  //       throw new Error('Brute force attack succeeded');
+  //     } catch (error) {
+  //       console.log(error);
+  //       expect((error as Error).message).toBe('Brute force attack unsuccessful');
+  //     }
+  //   }, 15000);
 });
