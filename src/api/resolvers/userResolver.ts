@@ -1,10 +1,25 @@
 import {GraphQLError} from 'graphql';
 import LoginMessageResponse from '../../interfaces/LoginMessageResponse';
 import {User, UserIdWithToken} from '../../interfaces/User';
+import {Post} from '../../interfaces/Post';
 
 const AUTH_URL = process.env.AUTH_URL;
 
 export default {
+  Post: {
+    // Fetch the author of a particular post.
+    author: async (parent: Post) => {
+      const res = await fetch(`${AUTH_URL}/users/${parent.author}`);
+
+      if (!res.ok) {
+        throw new GraphQLError(res.statusText, {
+          extensions: {code: 'NOT_FOUND'},
+        });
+      }
+
+      return (await res.json()) as User;
+    },
+  },
   Query: {
     // Fetch the list of users from the authentication service.
     users: async () => {
