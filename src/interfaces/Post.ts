@@ -7,4 +7,11 @@ interface Post extends Document {
   author: User;
 }
 
-export {Post};
+interface PostTest {
+  id?: string;
+  title?: string;
+  content?: string;
+  author?: User;
+}
+
+export {Post, PostTest};
