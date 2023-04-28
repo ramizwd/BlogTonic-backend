@@ -16,8 +16,8 @@ export default {
     },
 
     // Fetch a single post from graphql.
-    postsByAuthorId: async (_parent: unknown, args: Post) => {
-      return await postModel.find({author: args.author});
+    postsByAuthorId: async (_parent: unknown, args: {authorId: string}) => {
+      return await postModel.find({author: args.authorId});
     },
   },
 
