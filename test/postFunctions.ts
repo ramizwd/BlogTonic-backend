@@ -14,6 +14,8 @@ mutation CreatePost($title: String!, $content: String!) {
     id
     title
     content
+    createdAt
+    updatedAt
   }
 }
 */
@@ -41,6 +43,8 @@ const createPost = (
                             id
                             title
                             content
+                            createdAt
+                            updatedAt
                         }
                     }`,
         variables: post,
@@ -59,6 +63,8 @@ const createPost = (
           expect(newPost.author).toHaveProperty('username');
           expect(newPost.title).toBe(post.title);
           expect(newPost.content).toBe(post.content);
+          expect(newPost).toHaveProperty('createdAt');
+          expect(newPost).toHaveProperty('updatedAt');
           resolve(newPost);
         }
       });
@@ -76,6 +82,8 @@ query Posts {
       email
       username
     }
+    createdAt
+    updatedAt
   }
 }
 */
@@ -95,6 +103,8 @@ const getPosts = (url: string | Function): Promise<PostTest[]> => {
                                 email
                                 username
                             }
+                            createdAt
+                            updatedAt
                         }
                     }`,
       })
@@ -112,6 +122,8 @@ const getPosts = (url: string | Function): Promise<PostTest[]> => {
             expect(post.author).toHaveProperty('id');
             expect(post.author).toHaveProperty('email');
             expect(post.author).toHaveProperty('username');
+            expect(post).toHaveProperty('createdAt');
+            expect(post).toHaveProperty('updatedAt');
           });
           resolve(posts);
         }
@@ -150,6 +162,8 @@ const getPostById = (url: string | Function, id: string): Promise<PostTest> => {
                             id
                             title
                             content
+                            createdAt
+                            updatedAt
                         }
                     }`,
         variables: {postByIdId: id},
@@ -163,6 +177,8 @@ const getPostById = (url: string | Function, id: string): Promise<PostTest> => {
           expect(post).toHaveProperty('author');
           expect(post).toHaveProperty('title');
           expect(post).toHaveProperty('content');
+          expect(post).toHaveProperty('createdAt');
+          expect(post).toHaveProperty('updatedAt');
           expect(post.author).toHaveProperty('id');
           expect(post.author).toHaveProperty('email');
           expect(post.author).toHaveProperty('username');
@@ -183,6 +199,8 @@ query PostsByAuthorId($authorId: ID!) {
     id
     title
     content
+    createdAt
+    updatedAt
   }
 }
 */
@@ -205,6 +223,8 @@ const getPostsByAuthorId = (
                             id
                             title
                             content
+                            createdAt
+                            updatedAt
                         }
                     }`,
         variables: {authorId},
@@ -220,6 +240,8 @@ const getPostsByAuthorId = (
             expect(post).toHaveProperty('author');
             expect(post).toHaveProperty('title');
             expect(post).toHaveProperty('content');
+            expect(post).toHaveProperty('createdAt');
+            expect(post).toHaveProperty('updatedAt');
             expect(post.author).toHaveProperty('id');
             expect(post.author).toHaveProperty('email');
             expect(post.author).toHaveProperty('username');
