@@ -14,6 +14,13 @@ import {
   loginBrute,
   updateUser,
 } from './userFunctions';
+import {PostTest} from '../src/interfaces/Post';
+import {
+  createPost,
+  getPostById,
+  getPosts,
+  getPostsByAuthorId,
+} from './postFunctions';
 
 const DATABASE_URL = process.env.DATABASE_URL as string;
 
@@ -93,6 +100,35 @@ describe('GraphQL API tests', () => {
   // test delete user based on token
   it('should delete current user', async () => {
     await deleteUser(app, userData.token!);
+  });
+
+  const testPost: PostTest = {
+    title: 'test title',
+    content: 'test content',
+  };
+
+  // test create post
+  let postID1: string;
+  it('should create a new post', async () => {
+    await createUser(app, testUser);
+    userData = await login(app, testUser);
+    const post = await createPost(app, testPost, userData.token!);
+    postID1 = post.id!;
+  });
+
+  // test get all posts
+  it('should return an array of posts', async () => {
+    await getPosts(app);
+  });
+
+  // test get post by id
+  it('should return single post', async () => {
+    await getPostById(app, postID1);
+  });
+
+  // test get posts by author id
+  it('should return posts by author id', async () => {
+    await getPostsByAuthorId(app, userData.user.id!);
   });
 
   //   test brute force protection
