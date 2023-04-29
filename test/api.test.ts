@@ -16,10 +16,12 @@ import {
 import {PostTest} from '../src/interfaces/Post';
 import {
   createPost,
+  deletePost,
   getPostById,
   getPosts,
   getPostsByAuthorId,
   updatePost,
+  wrongUserDeletePost,
   wrongUserUpdatePost,
 } from './postFunctions';
 
@@ -151,6 +153,16 @@ describe('GraphQL API tests', () => {
         title: 'title' + randomstring.generate(7),
       };
       await wrongUserUpdatePost(app, newPost, postID1, loggedInUser2.token!);
+    });
+
+    // test should not delete post if not author
+    it('should not delete post if not author', async () => {
+      await wrongUserDeletePost(app, postID1, loggedInUser2.token!);
+    });
+
+    // test delete post
+    it('should delete post', async () => {
+      await deletePost(app, postID1, loggedInUser.token!);
     });
   });
 });

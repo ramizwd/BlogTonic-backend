@@ -51,8 +51,6 @@ export default {
         });
       }
 
-      const author = id as unknown as User;
-
       const post = await postModel.findById(updatePost.id);
 
       if (!post) {
@@ -62,7 +60,7 @@ export default {
       }
 
       // Check if the current user is the author of the post.
-      if (post.author.toString() !== author.toString()) {
+      if (post.author.toString() !== id.toString()) {
         throw new GraphQLError('You are not authorized to update this blog', {
           extensions: {code: 'NOT_AUTHORIZED'},
         });
@@ -72,11 +70,41 @@ export default {
         updatePost.id,
         {
           ...updatePost,
-          author,
+          id,
         },
         {new: true}
       );
       return updatedPost;
+    },
+
+    // Delete a post with graphql.
+    deletePost: async (
+      _parent: unknown,
+      {id}: {id: string},
+      {id: userId, token}: UserIdWithToken
+    ) => {
+      if (!token) {
+        throw new GraphQLError('You are not authorized to delete a blog', {
+          extensions: {code: 'NOT_AUTHORIZED'},
+        });
+      }
+
+      const post = await postModel.findById(id);
+
+      if (!post) {
+        throw new GraphQLError('Post not found', {
+          extensions: {code: 'NOT_FOUND'},
+        });
+      }
+
+      // Check if the current user is the author of the post.
+      if (post.author.toString() !== userId.toString()) {
+        throw new GraphQLError('You are not authorized to delete this blog', {
+          extensions: {code: 'NOT_AUTHORIZED'},
+        });
+      }
+
+      return await postModel.findByIdAndDelete(id);
     },
   },
 };
