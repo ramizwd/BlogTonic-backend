@@ -10,16 +10,10 @@ type Post {
 }
 
 type Query {
-  posts: [Post!]!
+  posts: [Post]
   postById(id: ID!): Post
   postsByAuthorId(authorId: ID!): [Post]
 }
-
-# input PostInput {
-#   title: String!
-#   content: String!
-#   author: ID!
-# }
 
 input UpdatePostInput {
   id: ID!

@@ -19,6 +19,8 @@ import {
   getPostById,
   getPosts,
   getPostsByAuthorId,
+  updatePost,
+  wrongUserUpdatePost,
 } from './postFunctions';
 
 const DATABASE_URL = process.env.DATABASE_URL as string;
@@ -132,6 +134,23 @@ describe('GraphQL API tests', () => {
     // test get posts by author id
     it('should return posts by author id', async () => {
       await getPostsByAuthorId(app, loggedInUser.user.id!);
+    });
+
+    // test update a post
+    it('should update a post', async () => {
+      const newPost: PostTest = {
+        title: 'titleUpdated' + randomstring.generate(7),
+        content: 'contentUpdated' + randomstring.generate(7),
+      };
+      await updatePost(app, newPost, postID1, loggedInUser.token!);
+    });
+
+    // test should not update post if not author
+    it('should not update post if not author', async () => {
+      const newPost: PostTest = {
+        title: 'title' + randomstring.generate(7),
+      };
+      await wrongUserUpdatePost(app, newPost, postID1, loggedInUser2.token!);
     });
   });
 });

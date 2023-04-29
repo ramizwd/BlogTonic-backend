@@ -252,4 +252,127 @@ const getPostsByAuthorId = (
   });
 };
 
-export {createPost, getPosts, getPostById, getPostsByAuthorId};
+/* test for graphql query
+mutation UpdatePost($updatePost: UpdatePostInput!) {
+  updatePost(updatePost: $updatePost) {
+    author {
+      id
+      email
+      username
+    }
+    id
+    title
+    content
+    createdAt
+    updatedAt
+  }
+}
+*/
+const updatePost = (
+  url: string | Function,
+  post: PostTest,
+  id: string,
+  token: string
+): Promise<PostTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: `mutation UpdatePost($updatePost: UpdatePostInput!) {
+                        updatePost(updatePost: $updatePost) {
+                            author {
+                                id
+                                email
+                                username
+                            }
+                            id
+                            title
+                            content
+                            createdAt
+                            updatedAt
+                        }
+                    }`,
+        variables: {
+          updatePost: {
+            id: id,
+            title: post.title,
+            content: post.content,
+          },
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const post = response.body.data.updatePost;
+          expect(post).toHaveProperty('id');
+          expect(post).toHaveProperty('author');
+          expect(post).toHaveProperty('title');
+          expect(post).toHaveProperty('content');
+          expect(post).toHaveProperty('updatedAt');
+          expect(post.author).toHaveProperty('id');
+          expect(post.author).toHaveProperty('email');
+          expect(post.author).toHaveProperty('username');
+          resolve(post);
+        }
+      });
+  });
+};
+
+const wrongUserUpdatePost = (
+  url: string | Function,
+  post: PostTest,
+  id: string,
+  token: string
+): Promise<PostTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: `mutation UpdatePost($updatePost: UpdatePostInput!) {
+                        updatePost(updatePost: $updatePost) {
+                            author {
+                                id
+                                email
+                                username
+                            }
+                            id
+                            title
+                            content
+                            createdAt
+                            updatedAt
+                        }
+                    }`,
+        variables: {
+          updatePost: {
+            id: id,
+            title: post.title,
+            content: post.content,
+          },
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const post = response.body.data.updatePost;
+          expect(post).toBe(null);
+          resolve(post);
+        }
+      });
+  });
+};
+
+export {
+  createPost,
+  getPosts,
+  getPostById,
+  getPostsByAuthorId,
+  updatePost,
+  wrongUserUpdatePost,
+};
