@@ -38,5 +38,45 @@ export default {
       const newPost = new postModel({...args, author});
       return await newPost.save();
     },
+
+    // Update a post with graphql.
+    updatePost: async (
+      _parent: unknown,
+      {updatePost}: {updatePost: Post},
+      {id, token}: UserIdWithToken
+    ) => {
+      if (!token) {
+        throw new GraphQLError('You are not authorized to update a blog', {
+          extensions: {code: 'NOT_AUTHORIZED'},
+        });
+      }
+
+      const author = id as unknown as User;
+
+      const post = await postModel.findById(updatePost.id);
+
+      if (!post) {
+        throw new GraphQLError('Post not found', {
+          extensions: {code: 'NOT_FOUND'},
+        });
+      }
+
+      // Check if the current user is the author of the post.
+      if (post.author.toString() !== author.toString()) {
+        throw new GraphQLError('You are not authorized to update this blog', {
+          extensions: {code: 'NOT_AUTHORIZED'},
+        });
+      }
+
+      const updatedPost = await postModel.findByIdAndUpdate(
+        updatePost.id,
+        {
+          ...updatePost,
+          author,
+        },
+        {new: true}
+      );
+      return updatedPost;
+    },
   },
 };
