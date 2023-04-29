@@ -368,6 +368,86 @@ const wrongUserUpdatePost = (
   });
 };
 
+/* test for graphql query
+mutation DeletePost($deletePostId: ID!) {
+  deletePost(id: $deletePostId) {
+    author {
+      id
+      email
+      username
+    }
+    id
+    title
+    content
+    createdAt
+    updatedAt
+  }
+}
+*/
+const deletePost = (
+  url: string | Function,
+  id: string,
+  token: string
+): Promise<PostTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: `mutation DeletePost($deletePostId: ID!) {
+            deletePost(id: $deletePostId) {
+              id
+            }
+          }`,
+        variables: {
+          deletePostId: id,
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const post = response.body.data.deletePost;
+          expect(post.id).toBe(id);
+          resolve(post);
+        }
+      });
+  });
+};
+
+const wrongUserDeletePost = (
+  url: string | Function,
+  id: string,
+  token: string
+): Promise<PostTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: `mutation DeletePost($deletePostId: ID!) {
+            deletePost(id: $deletePostId) {
+              id
+            }
+          }`,
+        variables: {
+          deletePostId: id,
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const post = response.body.data.deletePost;
+          expect(post).toBe(null);
+          resolve(post);
+        }
+      });
+  });
+};
+
 export {
   createPost,
   getPosts,
@@ -375,4 +455,6 @@ export {
   getPostsByAuthorId,
   updatePost,
   wrongUserUpdatePost,
+  deletePost,
+  wrongUserDeletePost,
 };
