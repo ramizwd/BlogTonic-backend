@@ -24,6 +24,7 @@ import {
   likePostAgain,
   postsLikedByUserId,
   unlikePost,
+  unlikePostAgain,
   updatePost,
   wrongUserDeletePost,
   wrongUserUpdatePost,
@@ -164,24 +165,31 @@ describe('GraphQL API tests', () => {
       await wrongUserDeletePost(app, postID1, loggedInUser2.token!);
     });
 
-    // test like post
-    it('should like post', async () => {
-      await likePost(app, postID1, loggedInUser.token!);
-    });
+    describe('Like posts tests', () => {
+      // test like post
+      it('should like post', async () => {
+        await likePost(app, postID1, loggedInUser.token!);
+      });
 
-    // test like post again
-    it('should not like post again', async () => {
-      await likePostAgain(app, postID1, loggedInUser.token!);
-    });
+      // test like post again
+      it('should not like post again', async () => {
+        await likePostAgain(app, postID1, loggedInUser.token!);
+      });
 
-    // test get posts user liked posts
-    it('should return user liked posts', async () => {
-      await postsLikedByUserId(app, loggedInUser.user.id!);
-    });
+      // test get posts user liked posts
+      it('should return user liked posts', async () => {
+        await postsLikedByUserId(app, loggedInUser.user.id!);
+      });
 
-    // test unlike post
-    it('should unlike post', async () => {
-      await unlikePost(app, postID1, loggedInUser.token!);
+      // test unlike post
+      it('should unlike post', async () => {
+        await unlikePost(app, postID1, loggedInUser.token!);
+      });
+
+      // test should not unlike post again
+      it('should not unlike post again', async () => {
+        await unlikePostAgain(app, postID1, loggedInUser.token!);
+      });
     });
 
     // test delete post
