@@ -2,6 +2,7 @@
 require('dotenv').config();
 import request from 'supertest';
 import expect from 'expect';
+import {PostTest} from '../src/interfaces/Post';
 
 /* test for graphql query
 mutation CreatePost($title: String!, $content: String!) {
@@ -19,9 +20,6 @@ mutation CreatePost($title: String!, $content: String!) {
   }
 }
 */
-
-import {PostTest} from '../src/interfaces/Post';
-
 const createPost = (
   url: string | Function,
   post: PostTest,
@@ -145,7 +143,6 @@ query PostById($postByIdId: ID!) {
   }
 }
 */
-
 const getPostById = (url: string | Function, id: string): Promise<PostTest> => {
   return new Promise((resolve, reject) => {
     request(url)
@@ -448,6 +445,257 @@ const wrongUserDeletePost = (
   });
 };
 
+/* test for graphql query
+mutation LikePost($postId: ID!) {
+  likePost(postId: $postId) {
+    author {
+      email
+      id
+      username
+    }
+    content
+    createdAt
+    id
+    title
+    updatedAt
+    likes
+  }
+}
+*/
+const likePost = (
+  url: string | Function,
+  id: string,
+  token: string
+): Promise<PostTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: `mutation LikePost($postId: ID!) {
+                        likePost(postId: $postId) {
+                            author {
+                                email
+                                id
+                                username
+                            }
+                            content
+                            createdAt
+                            id
+                            title
+                            updatedAt
+                            likes
+                        }
+                    }`,
+        variables: {
+          postId: id,
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const post = response.body.data.likePost;
+          expect(post).toHaveProperty('likes');
+          expect(post.likes).toBeInstanceOf(Array);
+          expect(post.likes).toBeInstanceOf(Array);
+          expect(post.likes.length).toBeGreaterThan(0);
+          expect(post).toHaveProperty('id');
+          expect(post).toHaveProperty('author');
+          expect(post).toHaveProperty('title');
+          expect(post).toHaveProperty('content');
+          expect(post).toHaveProperty('updatedAt');
+          expect(post.author).toHaveProperty('id');
+          expect(post.author).toHaveProperty('email');
+          expect(post.author).toHaveProperty('username');
+          resolve(post);
+        }
+      });
+  });
+};
+
+const likePostAgain = (
+  url: string | Function,
+  id: string,
+  token: string
+): Promise<PostTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: `mutation LikePost($postId: ID!) {
+                          likePost(postId: $postId) {
+                              author {
+                                  email
+                                  id
+                                  username
+                              }
+                              content
+                              createdAt
+                              id
+                              title
+                              updatedAt
+                              likes
+                          }
+                      }`,
+        variables: {
+          postId: id,
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const post = response.body.data.likePost;
+          console.log(post);
+          expect(post).toBe(null);
+          resolve(post);
+        }
+      });
+  });
+};
+
+/* test for graphql query
+query PostsLikedByUserId($userId: ID!) {
+  postsLikedByUserId(userId: $userId) {
+    author {
+      email
+      id
+      username
+    }
+    id
+    title
+    content
+    createdAt
+    updatedAt
+    likes
+  }
+}
+*/
+const postsLikedByUserId = (
+  url: string | Function,
+  id: string
+): Promise<PostTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Content-Type', 'application/json')
+      .send({
+        query: `query PostsLikedByUserId($userId: ID!) {
+
+                postsLikedByUserId(userId: $userId) {
+                    author {
+                        email
+                        id
+                        username
+                    }
+                    id
+                    title
+                    content
+                    createdAt
+                    updatedAt
+                    likes
+                }
+            }`,
+        variables: {
+          userId: id,
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const posts = response.body.data.postsLikedByUserId;
+          expect(posts).toBeInstanceOf(Array);
+          expect(posts.length).toBeGreaterThan(0);
+          expect(posts[0]).toHaveProperty('likes');
+          expect(posts[0]).toHaveProperty('id');
+          expect(posts[0]).toHaveProperty('author');
+          expect(posts[0]).toHaveProperty('title');
+          expect(posts[0]).toHaveProperty('content');
+          expect(posts[0]).toHaveProperty('updatedAt');
+          expect(posts[0].author).toHaveProperty('id');
+          expect(posts[0].author).toHaveProperty('email');
+          expect(posts[0].author).toHaveProperty('username');
+          resolve(posts);
+        }
+      });
+  });
+};
+
+/* test for graphql query
+mutation UnlikePost($postId: ID!) {
+  unlikePost(postId: $postId) {
+    author {
+      id
+      email
+      username
+    }
+    content
+    createdAt
+    id
+    likes
+    title
+    updatedAt
+  }
+}
+*/
+const unlikePost = (
+  url: string | Function,
+  id: string,
+  token: string
+): Promise<PostTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: `mutation UnlikePost($postId: ID!) {
+                        unlikePost(postId: $postId) {
+                            author {
+                                id
+                                email
+                                username
+                            }
+                            content
+                            createdAt
+                            id
+                            likes
+                            title
+                            updatedAt
+                        }
+                    }`,
+        variables: {
+          postId: id,
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const post = response.body.data.unlikePost;
+          expect(post).toHaveProperty('likes');
+          expect(post.likes).toBeInstanceOf(Array);
+          expect(post.likes).toBeInstanceOf(Array);
+          expect(post.likes.length).toBe(0);
+          expect(post).toHaveProperty('id');
+          expect(post).toHaveProperty('author');
+          expect(post).toHaveProperty('title');
+          expect(post).toHaveProperty('content');
+          expect(post).toHaveProperty('updatedAt');
+          expect(post.author).toHaveProperty('id');
+          expect(post.author).toHaveProperty('email');
+          expect(post.author).toHaveProperty('username');
+          resolve(post);
+        }
+      });
+  });
+};
+
 export {
   createPost,
   getPosts,
@@ -457,4 +705,8 @@ export {
   wrongUserUpdatePost,
   deletePost,
   wrongUserDeletePost,
+  likePost,
+  likePostAgain,
+  postsLikedByUserId,
+  unlikePost,
 };
