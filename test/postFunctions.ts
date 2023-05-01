@@ -696,6 +696,48 @@ const unlikePost = (
   });
 };
 
+const unlikePostAgain = (
+  url: string | Function,
+  id: string,
+  token: string
+): Promise<PostTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: `mutation UnlikePost($postId: ID!) {
+                          unlikePost(postId: $postId) {
+                              author {
+                                  id
+                                  email
+                                  username
+                              }
+                              content
+                              createdAt
+                              id
+                              likes
+                              title
+                              updatedAt
+                          }
+                      }`,
+        variables: {
+          postId: id,
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const post = response.body.data.unlikePost;
+          expect(post).toBe(null);
+          resolve(post);
+        }
+      });
+  });
+};
+
 export {
   createPost,
   getPosts,
@@ -709,4 +751,5 @@ export {
   likePostAgain,
   postsLikedByUserId,
   unlikePost,
+  unlikePostAgain,
 };
