@@ -19,6 +19,11 @@ export default {
     postsByAuthorId: async (_parent: unknown, args: {authorId: string}) => {
       return await postModel.find({author: args.authorId});
     },
+
+    // Fetch user liked posts from graphql.
+    postsLikedByUserId: async (_parent: unknown, args: {userId: string}) => {
+      return await postModel.find({likes: args.userId});
+    },
   },
 
   Mutation: {
@@ -105,6 +110,70 @@ export default {
       }
 
       return await postModel.findByIdAndDelete(id);
+    },
+
+    // Like a post with graphql.
+    likePost: async (
+      _parent: unknown,
+      args: {postId: string},
+      {id}: UserIdWithToken
+    ) => {
+      const post = await postModel.findById(args.postId);
+
+      if (!post) {
+        throw new GraphQLError('Post not found', {
+          extensions: {code: 'NOT_FOUND'},
+        });
+      }
+
+      const userId = id as unknown as User;
+      console.log(userId);
+      if (post.likes.includes(userId)) {
+        throw new GraphQLError('Post already liked', {
+          extensions: {code: 'BAD_REQUEST'},
+        });
+      }
+
+      post.likes.push(userId);
+      await post.save();
+
+      return post;
+    },
+
+    // Unlike a post with graphql.
+    unlikePost: async (
+      _parent: unknown,
+      args: {postId: string},
+      {id, token}: UserIdWithToken
+    ) => {
+      if (!token) {
+        throw new GraphQLError('You are not authorized to unlike a post', {
+          extensions: {code: 'NOT_AUTHORIZED'},
+        });
+      }
+
+      const userId = id as unknown as User;
+      const post = await postModel.findById(args.postId);
+
+      if (!post) {
+        throw new GraphQLError('Post not found', {
+          extensions: {code: 'NOT_FOUND'},
+        });
+      }
+
+      if (!post.likes.includes(userId)) {
+        throw new GraphQLError('Post not liked', {
+          extensions: {code: 'BAD_REQUEST'},
+        });
+      }
+
+      post.likes = post.likes.filter(
+        (likeId) => likeId.toString() !== userId.toString()
+      );
+      console.log(userId);
+      await post.save();
+
+      return post;
     },
   },
 };

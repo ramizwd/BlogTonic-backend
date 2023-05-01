@@ -5,6 +5,7 @@ interface Post extends Document {
   title: string;
   content: string;
   author: User;
+  likes: User[];
 }
 
 interface PostTest {
@@ -12,6 +13,7 @@ interface PostTest {
   title?: string;
   content?: string;
   author?: User;
+  likes?: User[];
 }
 
 export {Post, PostTest};
