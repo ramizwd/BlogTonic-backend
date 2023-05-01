@@ -20,6 +20,10 @@ import {
   getPostById,
   getPosts,
   getPostsByAuthorId,
+  likePost,
+  likePostAgain,
+  postsLikedByUserId,
+  unlikePost,
   updatePost,
   wrongUserDeletePost,
   wrongUserUpdatePost,
@@ -158,6 +162,26 @@ describe('GraphQL API tests', () => {
     // test should not delete post if not author
     it('should not delete post if not author', async () => {
       await wrongUserDeletePost(app, postID1, loggedInUser2.token!);
+    });
+
+    // test like post
+    it('should like post', async () => {
+      await likePost(app, postID1, loggedInUser.token!);
+    });
+
+    // test like post again
+    it('should not like post again', async () => {
+      await likePostAgain(app, postID1, loggedInUser.token!);
+    });
+
+    // test get posts user liked posts
+    it('should return user liked posts', async () => {
+      await postsLikedByUserId(app, loggedInUser.user.id!);
+    });
+
+    // test unlike post
+    it('should unlike post', async () => {
+      await unlikePost(app, postID1, loggedInUser.token!);
     });
 
     // test delete post
