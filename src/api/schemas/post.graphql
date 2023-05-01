@@ -5,6 +5,7 @@ type Post {
   title: String!
   content: String!
   author: User!
+  likes: [ID]!
   createdAt: DateTime!
   updatedAt: DateTime
 }
@@ -13,6 +14,7 @@ type Query {
   posts: [Post]
   postById(id: ID!): Post
   postsByAuthorId(authorId: ID!): [Post]
+  postsLikedByUserId(userId: ID!): [Post]
 }
 
 input UpdatePostInput {
@@ -25,4 +27,6 @@ type Mutation {
   createPost(title: String!, content: String!): Post
   updatePost(updatePost: UpdatePostInput!): Post
   deletePost(id: ID!): Post
+  likePost(postId: ID!): Post
+  unlikePost(postId: ID!): Post
 }
