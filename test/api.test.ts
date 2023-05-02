@@ -8,6 +8,7 @@ import LoginMessageResponse from '../src/interfaces/LoginMessageResponse';
 import {
   createUser,
   deleteUser,
+  deleteUserAsAdmin,
   getUserById,
   getUsers,
   login,
@@ -32,6 +33,8 @@ import {
 
 const DATABASE_URL = process.env.DATABASE_URL as string;
 
+// TODO: Wrong user delete user
+// TODO: Admin update user
 describe('GraphQL API tests', () => {
   beforeAll(async () => {
     await mongoose.connect(DATABASE_URL);
@@ -39,6 +42,7 @@ describe('GraphQL API tests', () => {
 
   let loggedInUser: LoginMessageResponse;
   let loggedInUser2: LoginMessageResponse;
+  let adminData: LoginMessageResponse;
 
   const testUser: UserTest = {
     username: 'TestUser' + randomstring.generate(7),
@@ -50,6 +54,11 @@ describe('GraphQL API tests', () => {
     username: 'TestUser' + randomstring.generate(7),
     email: randomstring.generate(9).toLowerCase() + '@user.com',
     password: 'testpassword1234!',
+  };
+
+  const adminUser: UserTest = {
+    email: 'admin@admin.com',
+    password: '123456',
   };
 
   afterAll(async () => {
@@ -82,6 +91,11 @@ describe('GraphQL API tests', () => {
       loggedInUser2 = await login(app, testUser2);
     });
 
+    // test login as admin
+    it('should login admin', async () => {
+      adminData = await login(app, adminUser);
+    });
+
     // test get all users
     it('should return an array of users', async () => {
       await getUsers(app);
@@ -100,6 +114,11 @@ describe('GraphQL API tests', () => {
     // test delete user based on token
     it('should delete current user', async () => {
       await deleteUser(app, loggedInUser.token!);
+    });
+
+    // test delete user by id as admin
+    it('should delete a user as admin', async () => {
+      await deleteUserAsAdmin(app, loggedInUser2.user.id!, adminData.token!);
     });
 
     // make sure token has role (so that we can test if user is admin or not)
