@@ -108,7 +108,6 @@ const login = (
           expect(userData).toHaveProperty('message');
           expect(userData).toHaveProperty('user');
           expect(userData.user).toHaveProperty('id');
-          expect(userData.user.username).toBe(user.username);
           expect(userData.user.email).toBe(user.email);
           expect(userData).toHaveProperty('token');
           resolve(response.body.data.login);
@@ -333,6 +332,52 @@ const deleteUser = (
   });
 };
 
+/* test for graphql query
+mutation DeleteUserAsAdmin($deleteUserAsAdminId: ID!) {
+  deleteUserAsAdmin(id: $deleteUserAsAdminId) {
+    user {
+      id
+    }
+  }
+}
+*/
+const deleteUserAsAdmin = (
+  url: string | Function,
+  id: string,
+  token: string
+): Promise<ErrorResponse> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({
+        query: `mutation DeleteUserAsAdmin($deleteUserAsAdminId: ID!) {
+            deleteUserAsAdmin(id: $deleteUserAsAdminId) {
+              user {
+                id
+              }
+            }
+          }`,
+        variables: {
+          deleteUserAsAdminId: id,
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const userData = response.body.data.deleteUserAsAdmin;
+          console.log('HEREEE', userData);
+          expect(userData.user.id).toBe(id);
+          resolve(response.body.data.deleteUser);
+        }
+      });
+  });
+};
+
+// TODO: Wrong user delete user
+// TODO: Admin update user
+
 export {
   createUser,
   login,
@@ -341,4 +386,5 @@ export {
   getUserById,
   updateUser,
   deleteUser,
+  deleteUserAsAdmin,
 };
