@@ -2,6 +2,7 @@ import {GraphQLError} from 'graphql';
 import LoginMessageResponse from '../../interfaces/LoginMessageResponse';
 import {User, UserIdWithToken} from '../../interfaces/User';
 import {Post} from '../../interfaces/Post';
+import postModel from '../models/postModel';
 
 const AUTH_URL = process.env.AUTH_URL;
 
@@ -132,6 +133,8 @@ export default {
         });
       }
 
+      await postModel.deleteMany({author: user.id});
+
       const response = await fetch(`${AUTH_URL}/users`, {
         method: 'DELETE',
         headers: {
@@ -190,6 +193,8 @@ export default {
           extensions: {code: 'NOT_AUTHORIZED'},
         });
       }
+
+      await postModel.deleteMany({author: args.id});
 
       const response = await fetch(`${AUTH_URL}/users/${args.id}`, {
         method: 'DELETE',

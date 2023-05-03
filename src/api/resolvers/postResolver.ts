@@ -163,7 +163,7 @@ export default {
       }
 
       const userId = id as unknown as User;
-      console.log(userId);
+
       if (post.likes.includes(userId)) {
         throw new GraphQLError('Post already liked', {
           extensions: {code: 'BAD_REQUEST'},
@@ -206,7 +206,7 @@ export default {
       post.likes = post.likes.filter(
         (likeId) => likeId.toString() !== userId.toString()
       );
-      console.log(userId);
+
       await post.save();
 
       return post;
