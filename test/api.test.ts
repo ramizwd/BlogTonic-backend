@@ -36,7 +36,8 @@ import {
 
 const DATABASE_URL = process.env.DATABASE_URL as string;
 
-// TODO: Wrong user delete user
+// TODO: Test Wrong user delete user
+// TODO: Test cascade delete posts when user is deleted
 describe('GraphQL API tests', () => {
   beforeAll(async () => {
     await mongoose.connect(DATABASE_URL);
@@ -149,6 +150,8 @@ describe('GraphQL API tests', () => {
 
     // test create post
     it('should create a new post', async () => {
+      await createUser(app, testUser);
+      loggedInUser = await login(app, testUser);
       const post = await createPost(app, testPost, loggedInUser.token!);
       postID1 = post.id!;
     });
