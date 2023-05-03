@@ -19,6 +19,7 @@ import {PostTest} from '../src/interfaces/Post';
 import {
   createPost,
   deletePost,
+  deletePostAsAdmin,
   getPostById,
   getPosts,
   getPostsByAuthorId,
@@ -28,6 +29,7 @@ import {
   unlikePost,
   unlikePostAgain,
   updatePost,
+  updatePostAsAdmin,
   wrongUserDeletePost,
   wrongUserUpdatePost,
 } from './postFunctions';
@@ -138,6 +140,7 @@ describe('GraphQL API tests', () => {
 
   describe('Post tests', () => {
     let postID1: string;
+    let postID2: string;
 
     const testPost: PostTest = {
       title: 'test title',
@@ -146,10 +149,14 @@ describe('GraphQL API tests', () => {
 
     // test create post
     it('should create a new post', async () => {
-      await createUser(app, testUser);
-      loggedInUser = await login(app, testUser);
       const post = await createPost(app, testPost, loggedInUser.token!);
       postID1 = post.id!;
+    });
+
+    // test create another post
+    it('should create another post', async () => {
+      const post = await createPost(app, testPost, loggedInUser.token!);
+      postID2 = post.id!;
     });
 
     // test get all posts
@@ -182,6 +189,15 @@ describe('GraphQL API tests', () => {
         title: 'title' + randomstring.generate(7),
       };
       await wrongUserUpdatePost(app, newPost, postID1, loggedInUser2.token!);
+    });
+
+    // test should update a post as admin ´
+    it('should update a post as admin', async () => {
+      const newPost: PostTest = {
+        title: 'titleUpdatedAsAdmin' + randomstring.generate(7),
+        content: 'contentUpdatedAsAdmin' + randomstring.generate(7),
+      };
+      await updatePostAsAdmin(app, newPost, postID1, adminData.token!);
     });
 
     // test should not delete post if not author
@@ -219,6 +235,11 @@ describe('GraphQL API tests', () => {
     // test delete post
     it('should delete post', async () => {
       await deletePost(app, postID1, loggedInUser.token!);
+    });
+
+    // test delete post as admin
+    it('should delete post as admin', async () => {
+      await deletePostAsAdmin(app, postID2, adminData.token!);
     });
   });
 });

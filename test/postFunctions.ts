@@ -366,6 +366,78 @@ const wrongUserUpdatePost = (
 };
 
 /* test for graphql query
+mutation UpdatePostAsAdmin($updatePostAsAdmin: UpdatePostInput!) {
+  updatePostAsAdmin(updatePostAsAdmin: $updatePostAsAdmin) {
+    author {
+      email
+      id
+      username
+    }
+    id
+    title
+    content
+    likes
+    createdAt
+    updatedAt
+  }
+}
+*/
+const updatePostAsAdmin = (
+  url: string | Function,
+  post: PostTest,
+  id: string,
+  token: string
+): Promise<PostTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: `mutation UpdatePostAsAdmin($updatePostAsAdmin: UpdatePostInput!) {
+                        updatePostAsAdmin(updatePostAsAdmin: $updatePostAsAdmin) {
+                            author {
+                                id
+                                email
+                                username
+                            }
+                            id
+                            title
+                            content
+                            createdAt
+                            updatedAt
+                        }
+                    }`,
+        variables: {
+          updatePostAsAdmin: {
+            id: id,
+            title: post.title,
+            content: post.content,
+          },
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const post = response.body.data.updatePostAsAdmin;
+          expect(post).toHaveProperty('id');
+          expect(post).toHaveProperty('author');
+          expect(post).toHaveProperty('title');
+          expect(post).toHaveProperty('content');
+          expect(post).toHaveProperty('updatedAt');
+          expect(post.author).toHaveProperty('id');
+          expect(post.author).toHaveProperty('email');
+          expect(post.author).toHaveProperty('username');
+          expect(post.title).toBe(post.title);
+          expect(post.content).toBe(post.content);
+          resolve(post);
+        }
+      });
+  });
+};
+
+/* test for graphql query
 mutation DeletePost($deletePostId: ID!) {
   deletePost(id: $deletePostId) {
     author {
@@ -439,6 +511,45 @@ const wrongUserDeletePost = (
         } else {
           const post = response.body.data.deletePost;
           expect(post).toBe(null);
+          resolve(post);
+        }
+      });
+  });
+};
+
+/* test for graphql query
+mutation DeletePostAsAdmin($deletePostAsAdminId: ID!) {
+  deletePostAsAdmin(id: $deletePostAsAdminId) {
+    id
+  }
+}
+*/
+const deletePostAsAdmin = (
+  url: string | Function,
+  id: string,
+  token: string
+): Promise<PostTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: `mutation DeletePostAsAdmin($deletePostAsAdminId: ID!) {
+                deletePostAsAdmin(id: $deletePostAsAdminId) {
+                id
+                }
+            }`,
+        variables: {
+          deletePostAsAdminId: id,
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const post = response.body.data.deletePostAsAdmin;
+          expect(post.id).toBe(id);
           resolve(post);
         }
       });
@@ -745,8 +856,10 @@ export {
   getPostsByAuthorId,
   updatePost,
   wrongUserUpdatePost,
+  updatePostAsAdmin,
   deletePost,
   wrongUserDeletePost,
+  deletePostAsAdmin,
   likePost,
   likePostAgain,
   postsLikedByUserId,
