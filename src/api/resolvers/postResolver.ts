@@ -112,6 +112,42 @@ export default {
       return await postModel.findByIdAndDelete(id);
     },
 
+    // Update a post as admin with graphql.
+    updatePostAsAdmin: async (
+      _parent: unknown,
+      args: {updatePostAsAdmin: Post},
+      {token, isAdmin}: UserIdWithToken
+    ) => {
+      if (!token || !isAdmin) {
+        throw new GraphQLError('You are not authorized to update a blog', {
+          extensions: {code: 'NOT_AUTHORIZED'},
+        });
+      }
+
+      return await postModel.findByIdAndUpdate(
+        args.updatePostAsAdmin.id,
+        args.updatePostAsAdmin,
+        {
+          new: true,
+        }
+      );
+    },
+
+    // Delete a post as admin with graphql.
+    deletePostAsAdmin: async (
+      _parent: unknown,
+      args: {id: string},
+      {token, isAdmin}: UserIdWithToken
+    ) => {
+      if (!token || !isAdmin) {
+        throw new GraphQLError('You are not authorized to delete a blog', {
+          extensions: {code: 'NOT_AUTHORIZED'},
+        });
+      }
+
+      return await postModel.findByIdAndDelete(args.id);
+    },
+
     // Like a post with graphql.
     likePost: async (
       _parent: unknown,

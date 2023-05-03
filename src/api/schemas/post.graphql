@@ -27,6 +27,8 @@ type Mutation {
   createPost(title: String!, content: String!): Post
   updatePost(updatePost: UpdatePostInput!): Post
   deletePost(id: ID!): Post
+  updatePostAsAdmin(updatePostAsAdmin: UpdatePostInput!): Post
+  deletePostAsAdmin(id: ID!): Post
   likePost(postId: ID!): Post
   unlikePost(postId: ID!): Post
 }
