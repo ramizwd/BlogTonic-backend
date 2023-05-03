@@ -152,7 +152,7 @@ export default {
     // Update a user as admin with the authentication service.
     updateUserAsAdmin: async (
       _parent: unknown,
-      args: {user: User},
+      args: {user: User; id: string},
       user: UserIdWithToken
     ) => {
       if (!user.token || !user.isAdmin) {
@@ -161,7 +161,7 @@ export default {
         });
       }
 
-      const response = await fetch(`${AUTH_URL}/users/${args.user.id}`, {
+      const response = await fetch(`${AUTH_URL}/users/${args.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -13,6 +13,7 @@ import {
   getUsers,
   login,
   updateUser,
+  updateUserAsAdmin,
 } from './userFunctions';
 import {PostTest} from '../src/interfaces/Post';
 import {
@@ -34,7 +35,6 @@ import {
 const DATABASE_URL = process.env.DATABASE_URL as string;
 
 // TODO: Wrong user delete user
-// TODO: Admin update user
 describe('GraphQL API tests', () => {
   beforeAll(async () => {
     await mongoose.connect(DATABASE_URL);
@@ -109,6 +109,11 @@ describe('GraphQL API tests', () => {
     // test update user
     it('should update user', async () => {
       await updateUser(app, loggedInUser.token!);
+    });
+
+    // test update user as admin
+    it('should update user as admin', async () => {
+      await updateUserAsAdmin(app, loggedInUser2.user.id!, adminData.token!);
     });
 
     // test delete user based on token

@@ -6,6 +6,8 @@ import LoginMessageResponse from '../src/interfaces/LoginMessageResponse';
 import randomstring from 'randomstring';
 import ErrorResponse from '../src/interfaces/ErrorResponse';
 
+// TODO: Wrong user delete user
+
 /* test for graphql query
 mutation Register($user: UserInput!) {
   register(user: $user) {
@@ -367,7 +369,6 @@ const deleteUserAsAdmin = (
           reject(err);
         } else {
           const userData = response.body.data.deleteUserAsAdmin;
-          console.log('HEREEE', userData);
           expect(userData.user.id).toBe(id);
           resolve(response.body.data.deleteUser);
         }
@@ -375,8 +376,61 @@ const deleteUserAsAdmin = (
   });
 };
 
-// TODO: Wrong user delete user
-// TODO: Admin update user
+/* test for graphql query
+mutation UpdateUserAsAdmin($updateUserAsAdminId: ID!, $user: UserModify!) {
+  updateUserAsAdmin(id: $updateUserAsAdminId, user: $user) {
+    user {
+      id
+      email
+      username
+    }
+    message
+  }
+}
+*/
+const updateUserAsAdmin = (
+  url: string | Function,
+  id: string,
+  token: string
+): Promise<ErrorResponse> => {
+  return new Promise((resolve, reject) => {
+    const newUser = 'newUser' + randomstring.generate(5);
+    request(url)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({
+        query: `mutation UpdateUserAsAdmin($updateUserAsAdminId: ID!, $user: UserModify!) {
+                    updateUserAsAdmin(id: $updateUserAsAdminId, user: $user) {
+                        user {
+                            id
+                            email
+                            username
+                        }
+                        message
+                    }
+                }`,
+        variables: {
+          updateUserAsAdminId: id,
+          user: {
+            username: newUser,
+          },
+        },
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const userData = response.body.data.updateUserAsAdmin;
+          expect(userData).toHaveProperty('message');
+          expect(userData).toHaveProperty('user');
+          expect(userData.user).toHaveProperty('id');
+          expect(userData.user).toHaveProperty('username');
+          expect(userData.user).toHaveProperty('email');
+          resolve(response.body.data.updateUserAsAdmin);
+        }
+      });
+  });
+};
 
 export {
   createUser,
@@ -386,5 +440,6 @@ export {
   getUserById,
   updateUser,
   deleteUser,
+  updateUserAsAdmin,
   deleteUserAsAdmin,
 };
