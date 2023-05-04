@@ -36,8 +36,6 @@ import {
 
 const DATABASE_URL = process.env.DATABASE_URL as string;
 
-// TODO: Test Wrong user delete user
-// TODO: Test cascade delete posts when user is deleted
 describe('GraphQL API tests', () => {
   beforeAll(async () => {
     await mongoose.connect(DATABASE_URL);
