@@ -6,8 +6,6 @@ import LoginMessageResponse from '../src/interfaces/LoginMessageResponse';
 import randomstring from 'randomstring';
 import ErrorResponse from '../src/interfaces/ErrorResponse';
 
-// TODO: Wrong user delete user
-
 /* test for graphql query
 mutation Register($user: UserInput!) {
   register(user: $user) {
