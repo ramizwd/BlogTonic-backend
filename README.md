@@ -6,7 +6,7 @@ This is a Node.js server that provides functionalities for the [BlogTonic client
 
 ### Prerequisites
 
-- Node.js (version 16 or higher)
+- [Node.js](https://nodejs.org/en) (version 16.x or higher)
 - npm or yarn package manager
 
 ### Installing
@@ -62,4 +62,4 @@ The server will be available at [http://localhost:3000/graphql](http://localhost
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/ramizwd/BlogTonic-backend/blob/main/LICENSE) file for details.
